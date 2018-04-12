@@ -13,6 +13,7 @@ int main(int argc, char const *argv[])
 	int habilita = 1;
 	struct sockaddr_in endereco, cliente;
 	char buffer[1024] = {0};
+	char resp[3] = 'OK\0';
 
 
 	desc_socket = socket(AF_INET, // IPv4
@@ -70,8 +71,18 @@ int main(int argc, char const *argv[])
 
 		printf("Conectou...");
 
-		lido = read(cliente, buffer, 1024);
+		lido = read(desc_cliente, buffer, 1024);
 		printf("%s\n", buffer);
+
+		/* TODO: LER BUFFER */
+
+
+		/* TODO: Responder */
+		if (write(desc_cliente, resp, strlen(resp)) < 0)
+		{
+			perror("Enviar dados");
+			exit(EXIT_FAILURE);
+		}
 
 	}
 
