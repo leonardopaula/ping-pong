@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
 	int habilita = 1;
 	struct sockaddr_in endereco, cliente;
 	char buffer[1024] = {0};
-	char resp[3] = 'OK\0';
+	const char resp[] = "OK\0";
 
 
 	desc_socket = socket(AF_INET, // IPv4
