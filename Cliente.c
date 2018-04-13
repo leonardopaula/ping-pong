@@ -7,15 +7,16 @@
 #include<netinet/in.h>
 #include<string.h>
 #include<unistd.h>
+#include<sys/time.h>
 #define SRV_HOST "127.0.0.1"
 #define SRV_PORTA 50000
 #define R 0x52
 
 int main()
 {
-	int isocket, iconector, i;
+	int isocket, iconector, i, lido;
 	struct sockaddr_in servidor;
-	char buffer[2000];
+	char buffer[2000], resp[3];
 	struct timeval inicio, fim;
 
 	isocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,7 +58,11 @@ int main()
 	}
 
 	/* TODO: Receber */
-	
+	lido = read(isocket, resp, 3);
+	printf("Resp: %s\n", resp);
+	gettimeofday(&fim, NULL);
+
+	printf("-> %.06f\n", ((fim.tv_sec - inicio.tv_sec) + (fim.tv_usec - inicio.tv_usec) * 1e-6));
 
 	close(isocket);
 

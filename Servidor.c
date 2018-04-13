@@ -74,7 +74,7 @@ int main(int argc, char const *argv[])
 		lido = read(desc_cliente, buffer, 1024);
 		printf("%s\n", buffer);
 
-		/* TODO: LER BUFFER */
+		/* TODO: LER DO BUFFER */
 
 
 		/* TODO: Responder */
