@@ -8,13 +8,13 @@
 #include<string.h>
 #include<unistd.h>
 #include<sys/time.h>
+#include<Util.c>
 #define SRV_HOST "127.0.0.1"
 #define SRV_PORTA 50000
-#define R 0x52
 
 int main()
 {
-	int isocket, iconector, i, lido;
+	int isocket, iconector, i, lido, tamanho_mensagem;
 	struct sockaddr_in servidor;
 	char buffer[2000], resp[3];
 	struct timeval inicio, fim;
@@ -40,18 +40,19 @@ int main()
 
 	/* Conexão estabelecida */
 	bzero(buffer, sizeof(buffer));
+	tamanho_mensagem = 12;
 
-	for(i=0; i < 1024; i++)
+	for(i=0; i < tamanho_mensagem; i++)
 	{
-		buffer[i] = (char *) R;
+		buffer[i] = 'D';
 	}
-	buffer[1024-1] = '\0';
+	buffer[tamanho_mensagem] = '\t';
 
-	printf("Enviando...%d\n", strlen(buffer));
+	printf("Enviando...%s\n", buffer);
 
 	// Enviando
 	gettimeofday(&inicio, NULL);
-	if (write(isocket, buffer, strlen(buffer)) < 0)
+	if (write(isocket, buffer, strlen(buffer)+1) < 0)
 	{
 		perror("Enviar dados");
 		exit(EXIT_FAILURE);

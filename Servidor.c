@@ -4,7 +4,8 @@
 #include<stdlib.h>
 #include<netinet/in.h>
 #include<string.h>
-#include <unistd.h>
+#include<unistd.h>
+#include "Util.c"
 #define PORTA 50000
 
 int main(int argc, char const *argv[])
@@ -57,6 +58,7 @@ int main(int argc, char const *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	printf("Escutando...");
 	// Frita
 	while(1)
 	{
@@ -71,7 +73,8 @@ int main(int argc, char const *argv[])
 
 		printf("Conectou...");
 
-		lido = read(desc_cliente, buffer, 1024);
+		//lido = read(desc_cliente, buffer, 1024);
+		tcp_recebe(desc_cliente, &lido);
 		printf("%s\n", buffer);
 
 		/* TODO: LER DO BUFFER */
