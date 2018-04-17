@@ -30,10 +30,7 @@ char *tcp_recebe(int socket, int *lido)
 		if (strstr(buffer, "\t\0") != NULL)
 		{
 			buffer[--iOffset] = '\0';
-			printf("Sim: %s\n", buffer);
 			break;
-		} else {
-			printf("Nop: %s\n", buffer);
 		}
 
 	}
@@ -46,9 +43,46 @@ char *tcp_recebe(int socket, int *lido)
 	}
 
 
-	printf("Data: %s\n", buffer);
+	//printf("Data: %s\n", buffer);
 
 	return buffer;
 }
 
-//char *tcp_envia(int socket, )
+char *monta_mensagem(int tamanho_mensagem)
+{
+	int i;
+	struct timeval inicio, fim;
+	char *msg;
+
+	msg = malloc(sizeof(char) * (tamanho_mensagem + 1));
+	memset(msg, 0, sizeof(msg));
+
+	// printf("%d\n", tamanho_mensagem);
+	// Popula mensagem
+	for(i=0; i < tamanho_mensagem; i++)
+	{
+		msg[i] = 'D';
+	}
+	msg[tamanho_mensagem-1] = '\t';
+
+	//printf("msg: %s\n", msg);
+
+	return msg;
+}
+
+
+int tcp_envia(int socket, char *buffer)
+{
+
+	//printf("Enviando...%s\n", buffer);
+
+	// Enviando
+	//gettimeofday(&inicio, NULL);
+	if (write(socket, buffer, strlen(buffer)+1) < 0)
+	{
+		perror("Enviar dados");
+		exit(EXIT_FAILURE);
+	}
+
+	return 0;
+}

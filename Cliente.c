@@ -8,62 +8,77 @@
 #include<string.h>
 #include<unistd.h>
 #include<sys/time.h>
-#include<Util.c>
+#include"Util.c"
 #define SRV_HOST "127.0.0.1"
 #define SRV_PORTA 50000
+#define MAX_ENVIO 1000000
+#define INCREMENTO 500
+
+int envia(const struct sockaddr_in *servidor, char *msg, double *tempo);
 
 int main()
 {
-	int isocket, iconector, i, lido, tamanho_mensagem;
+	int tamanho_mensagem;
 	struct sockaddr_in servidor;
-	char buffer[2000], resp[3];
-	struct timeval inicio, fim;
-
-	isocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (isocket < 0)
-	{
-		perror("Socket");
-		exit(EXIT_FAILURE);
-	}
+	char *msg;
+	double tempo;
 
 	servidor.sin_family = AF_INET;
 	servidor.sin_port = htons(SRV_PORTA);
 	servidor.sin_addr.s_addr = inet_addr(SRV_HOST);
 	bzero(&(servidor.sin_zero), 8);
 
-	iconector = connect(isocket, (struct sockaddr *)&servidor, sizeof(servidor));
+	printf("Tamanho;Tempo;\n");
+	do
+	{
+		tamanho_mensagem = tamanho_mensagem + INCREMENTO;
+		msg  = monta_mensagem(tamanho_mensagem);
+		//printf("%s\n", msg);
+		envia(&servidor, msg, &tempo);
+
+		printf("%d;%.06f\n", tamanho_mensagem,tempo);	
+
+	} while(tamanho_mensagem < MAX_ENVIO);
+	//printf("-> %.06f\n", ((fim.tv_sec - inicio.tv_sec) + (fim.tv_usec - inicio.tv_usec) * 1e-6));
+
+
+	return 0;
+}
+
+int envia(const struct sockaddr_in *servidor, char *msg, double *tempo)
+{
+	int isocket, iconector, tamanho_mensagem, iretorno;
+	char *retorno;
+	struct timeval tInicio, tFim;
+
+	isocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (isocket < 0)
+	{
+	  	perror("Socket");
+		exit(EXIT_FAILURE);
+	}
+
+	iconector = connect(isocket, (struct sockaddr *)servidor, sizeof(*servidor));
 	if (iconector < 0)
 	{
 		perror("Ao conectar");
 		exit(EXIT_FAILURE);
 	}
 
-	/* Conexão estabelecida */
-	bzero(buffer, sizeof(buffer));
-	tamanho_mensagem = 12;
+	*(tempo) = 0;
 
-	for(i=0; i < tamanho_mensagem; i++)
+	gettimeofday(&tInicio, NULL);
+	iretorno = tcp_envia(isocket, msg);
+	free(msg);
+
+	retorno = tcp_recebe(isocket, &tamanho_mensagem);
+	gettimeofday(&tFim, NULL);
+
+	if (retorno != NULL)
 	{
-		buffer[i] = 'D';
+		*(tempo) = (tFim.tv_sec - tInicio.tv_sec) + (tFim.tv_usec - tInicio.tv_usec) * 1e-6;
+		free(retorno);
 	}
-	buffer[tamanho_mensagem] = '\t';
-
-	printf("Enviando...%s\n", buffer);
-
-	// Enviando
-	gettimeofday(&inicio, NULL);
-	if (write(isocket, buffer, strlen(buffer)+1) < 0)
-	{
-		perror("Enviar dados");
-		exit(EXIT_FAILURE);
-	}
-
-	/* TODO: Receber */
-	lido = read(isocket, resp, 3);
-	printf("Resp: %s\n", resp);
-	gettimeofday(&fim, NULL);
-
-	printf("-> %.06f\n", ((fim.tv_sec - inicio.tv_sec) + (fim.tv_usec - inicio.tv_usec) * 1e-6));
 
 	close(isocket);
 

@@ -10,11 +10,11 @@
 
 int main(int argc, char const *argv[])
 {
-	int desc_socket, desc_cliente, lido;
+	int desc_socket, desc_cliente, lido, enviado;
 	int habilita = 1;
 	struct sockaddr_in endereco, cliente;
-	char buffer[1024] = {0};
-	const char resp[] = "OK\0";
+	char *rec_msg;
+	char resp[] = "OK\t";
 
 
 	desc_socket = socket(AF_INET, // IPv4
@@ -73,20 +73,15 @@ int main(int argc, char const *argv[])
 
 		printf("Conectou...");
 
-		//lido = read(desc_cliente, buffer, 1024);
-		tcp_recebe(desc_cliente, &lido);
-		printf("%s\n", buffer);
+		rec_msg = tcp_recebe(desc_cliente, &lido);
+		printf("Recebido: %d\n", lido);
 
-		/* TODO: LER DO BUFFER */
+		// Responde
+		enviado = tcp_envia(desc_cliente, resp);
 
+		free(rec_msg);
 
-		/* TODO: Responder */
-		if (write(desc_cliente, resp, strlen(resp)) < 0)
-		{
-			perror("Enviar dados");
-			exit(EXIT_FAILURE);
-		}
-
+		close(desc_cliente);
 	}
 
 
